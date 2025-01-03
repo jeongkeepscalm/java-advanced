@@ -1,4 +1,4 @@
-package network.tcp.v1;
+package network.tcp.v2;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -8,12 +8,18 @@ import java.util.Scanner;
 
 import static util.MyLogger.log;
 
-public class ClientV3 {
+/**
+ * V2: 서버가 하나의 클라이언트의 연결만 처리
+ *      ServerV2, ClientV2, ClientV2-2 차례대로 실행시킬 때,
+ *      ClientV2-2 와 ServerV2 tcp 연결은 성공되지만
+ *      OS backlog queue 에 먼저 연결된 ClientV2 정보가 존재하므로
+ *      ClientV2-2 는 대기하게 된다.
+ */
+public class ClientV2 {
 
     public static final int PORT = 12345;
 
     public static void main(String[] args) throws IOException {
-
         log("클라이언트 시작");
 
         Socket socket = new Socket("localhost", PORT);
@@ -23,10 +29,10 @@ public class ClientV3 {
 
         Scanner scanner = new Scanner(System.in);
         while (true) {
-            System.out.print("전송 문자: ");
+            System.out.println("전송 문자: ");
             String toSend = scanner.nextLine();
-
-            // 서버에게 문자 보내기
+            
+            // 서버로 문자 보내기
             output.writeUTF(toSend);
             log("client -> server: " + toSend);
 
