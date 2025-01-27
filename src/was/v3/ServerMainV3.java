@@ -1,16 +1,16 @@
-package was.v2;
+package was.v3;
 
 import java.io.IOException;
 
 /**
  * 동시 요청 허용
  */
-public class ServerMainV2 {
+public class ServerMainV3 {
 
     private static final int PORT = 12345;
 
     public static void main(String[] args) throws IOException {
-        HttpServerV2 server = new HttpServerV2(PORT);
+        HttpServerV3 server = new HttpServerV3(PORT);
         server.start();
     }
 
