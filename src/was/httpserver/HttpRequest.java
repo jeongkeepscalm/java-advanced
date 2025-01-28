@@ -7,6 +7,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
+import static util.MyLogger.log;
+
 public class HttpRequest {
 
     private String method;
@@ -18,6 +20,7 @@ public class HttpRequest {
         parseRequestLine(reader);
         parseHeaders(reader);
         // 메시지 바디는 이후에 처리
+        parseBody(reader); // 추가
     }
 
     private void parseRequestLine(BufferedReader reader) throws IOException {
@@ -82,6 +85,33 @@ public class HttpRequest {
                 ", queryParameters=" + queryParameters +
                 ", headers=" + headers +
                 '}';
+    }
+
+
+    // 추가
+    private void parseBody(BufferedReader reader) throws IOException {
+        if (!headers.containsKey("Content-Length")) {
+            return;
+        }
+
+        int contentLength = Integer.parseInt(headers.get("Content-Length"));
+        char[] bodyChars = new char[contentLength];
+        int read = reader.read(bodyChars);
+        if (read != contentLength) {
+            /*
+                Content-Length 의 길이 만큼 스트림에서 메시지 바디의 데이터를 읽어온다.
+                만약 읽어온 길이가 다르다면 문제가 있다고 보고 예외를 던진다.
+            */
+            throw new IOException("Failed to read entire body. Expected " +
+                    contentLength + " bytes, but read " + read);
+        }
+        String body = new String(bodyChars);
+        log("HTTP Message Body: " + body);
+        String contentType = headers.get("Content-Type");
+        if ("application/x-www-form-urlencoded".equals(contentType)) {
+            parseQueryParameters(body);
+        }
+
     }
 
 }
